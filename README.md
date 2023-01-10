@@ -7,7 +7,6 @@ NOTE: Plugboard  hasn't been implemented yet
 ```
 cmake -S . -B build
 cmake --build build --config RelWithDebInfo --target all -j 6 --
-./build/enigma_example
 ```
 
 ## Demo
@@ -16,7 +15,9 @@ Settings:
   * initial position: A, A, A
   * ring setting (offset): A, A, A (only fixed to A, A, A currently)
 * Reflector: UKW-B (which is used in WWII)  
-
+```
+./build/enigma_example
+```
 test Input `HelloWorld` 
 Output
 ```
