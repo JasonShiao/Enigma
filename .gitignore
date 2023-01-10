@@ -1,3 +1,2 @@
-Enigma
-.*
-!.gitignore
+build/
+.vscode/
