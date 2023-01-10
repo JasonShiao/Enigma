@@ -1,7 +1,14 @@
 # Enigma I
 A simple implementation of Enigma I machine
 
-Plugboard  hasn't been implemented yet
+NOTE: Plugboard  hasn't been implemented yet
+
+## Build
+```
+cmake -S . -B build
+cmake --build build --config RelWithDebInfo --target all -j 6 --
+./build/enigma_example
+```
 
 ## Demo
 Settings: 
@@ -11,10 +18,6 @@ Settings:
 * Reflector: UKW-B (which is used in WWII)  
 
 test Input `HelloWorld` 
-```
-make
-./Enigma
-```
 Output
 ```
 MFNCZBBFZM
