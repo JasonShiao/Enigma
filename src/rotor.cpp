@@ -6,7 +6,7 @@
 
 #include "rotor.h"
 
-Rotor::Rotor(std::string rotor_name, char init_pos, char notch_pos, std::string forward_table)
+Rotor::Rotor(std::string rotor_name, char init_pos, char notch_pos, std::string forward_table_str)
 {
   try {
     if (toupper(init_pos) < 'A' && toupper(init_pos) > 'Z') {
@@ -15,7 +15,7 @@ Rotor::Rotor(std::string rotor_name, char init_pos, char notch_pos, std::string 
     if (toupper(notch_pos) < 'A' && toupper(notch_pos) > 'Z') {
         throw 1;
     }
-    if (forward_table.length() != 26) {
+    if (forward_table_str.length() != 26) {
         throw 1;
     }
 
@@ -23,8 +23,8 @@ Rotor::Rotor(std::string rotor_name, char init_pos, char notch_pos, std::string 
     this->_current_letter = toupper(init_pos);
     this->_notch_letter = toupper(notch_pos);
     for (auto i = 0; i < 26; i++) {
-      this->_forward_table[i] = forward_table[i];
-      this->_backward_table[forward_table[i] - 'A'] = i + 'A';
+      this->_forward_table[i] = forward_table_str[i] - 'A';
+      this->_backward_table[forward_table_str[i] - 'A'] = i;
     }
   }
   catch (int e) {
@@ -42,11 +42,14 @@ char Rotor::forwardWire(char input)
       throw 1;
     }
 
-    char local_pos, abs_pos;
+    int local_pos, abs_pos;
     //std::cout << "Current pos: " << this->_current_letter << std::endl;
-    local_pos = this->_forward_table[(input - 'A' + this->_current_letter - 'A')%26];
-    abs_pos = ((local_pos - this->_current_letter) >= 0?(local_pos - this->_current_letter + 'A'):(local_pos + 26 - this->_current_letter + 'A'));
-    return abs_pos;
+    local_pos = this->_forward_table[(input - 'A' + this->_current_letter - 'A') % 26];
+    abs_pos = (local_pos >= (this->_current_letter - 'A') ? 
+                local_pos - (this->_current_letter - 'A') :
+                local_pos - (this->_current_letter - 'A') + 26
+              );
+    return abs_pos + 'A';
   }
   catch (int e) {
     std::cout << "An exception occurred. Invalid input key." << std::endl;
@@ -63,10 +66,13 @@ char Rotor::backwardWire(char input)
       throw 1;
     }
 
-    char local_pos, abs_pos;
-    local_pos = this->_backward_table[(input - 'A' + this->_current_letter - 'A')%26];
-    abs_pos = ((local_pos - this->_current_letter) >= 0?(local_pos - this->_current_letter + 'A'):(local_pos + 26 - this->_current_letter + 'A'));
-    return abs_pos;
+    int local_pos, abs_pos;
+    local_pos = this->_backward_table[(input - 'A' + this->_current_letter - 'A') % 26];
+    abs_pos = (local_pos >= (this->_current_letter - 'A') ? 
+                local_pos - (this->_current_letter - 'A') :
+                local_pos - (this->_current_letter - 'A') + 26
+              );
+    return abs_pos + 'A';
   }
   catch (int e) {
     std::cout << "An exception occurred. Invalid input key." << std::endl;
@@ -74,7 +80,7 @@ char Rotor::backwardWire(char input)
   }
 }
 
-void Rotor::ratchetRotate()
+void Rotor::rotate()
 {
   assert(this->_current_letter >= 'A' && this->_current_letter <= 'Z');
 
@@ -82,21 +88,6 @@ void Rotor::ratchetRotate()
     this->_current_letter = 'A';
   } else {
     this->_current_letter++;
-  }
-}
-
-void Rotor::notchRotate()
-{
-  assert(this->_current_letter >= 'A' && this->_current_letter <= 'Z');
-
-  if (this->_current_letter == this->_notch_letter) { // lever engaged
-    if (this->_current_letter == 'Z') {
-      this->_current_letter = 'A';
-    } else {
-      this->_current_letter++;
-    }
-  } else {
-    // lever not engaged, no push force
   }
 }
 
@@ -124,9 +115,16 @@ char Rotor::getNotchLetter()
   return this->_notch_letter;
 }
 
+void Rotor::getForwardTableString(char *table_str) {
+  for (auto idx = 0; idx < 26; idx++) {
+    table_str[idx] = 'A' + _forward_table[idx];
+  }
+}
 
 void Rotor::print()
 {
+  char table_str[27] = {0};
+  getForwardTableString(table_str);
   std::cout << "------------------------------------------------------" << std::endl;
   std::cout << "| ";std::cout.width(21); std::cout << std::right << "Rotor Name: ";
   std::cout.width(30); std::cout << std::left << this->_rotor_name; std::cout << "|" << std::endl;
@@ -135,7 +133,7 @@ void Rotor::print()
   std::cout << "| ";std::cout.width(21); std::cout << std::right << "Notch Pos: ";
   std::cout.width(30); std::cout << std::left << this->_notch_letter; std::cout << "|" << std::endl;
   std::cout << "| ";std::cout.width(21); std::cout << std::right << "Rotor internal wire: ";
-  std::cout.width(30); std::cout << std::left << this->_forward_table; std::cout << "|" << std::endl;
+  std::cout.width(30); std::cout << std::left << table_str; std::cout << "|" << std::endl;
   std::cout << "------------------------------------------------------" << std::endl;
   std::cout << std::endl;
   return;
