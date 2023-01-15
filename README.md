@@ -17,7 +17,9 @@ But the first rotor (I) always steps so the stepping of the second (II) rotor do
 Thus, the total number of states is not `26*26*26` but `26*25*26`. <br />
 You can refer to this [video](https://youtu.be/hcVhQeZ5gI4) for a clearer understanding.
 
-TODO: Plugboard
+### TODO: 
+* Plugboard: Swap of letter at the beginning and the end
+* Ring Setting (Ringstellung): The relative position of the ring wire to the alphabet ring on rotor
 
 ### References
 * [Crypto Museum](https://www.cryptomuseum.com/crypto/enigma/wiring.htm)

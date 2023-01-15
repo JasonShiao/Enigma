@@ -6,15 +6,15 @@
 class Lever
 {
  public:
-  Lever(Rotor *right_rotor, Rotor *left_rotor);
-  void press();
-  void update(); // update relative position with rotors (update notch status)
+  Lever(Rotor *first_rotor, Rotor *second_rotor);
+  bool checkEngaged();
+  Rotor* getFirstRotor();
+  Rotor* getSecondRotor();
 
  private:
-  Rotor* _right_rotor = NULL; // notch-contact rotor (fast)
-  Rotor* _left_rotor = NULL;  // ratchet-contact rotor (slow)
-  bool _is_notch_engaged = false;     // fall into the notch
-  bool _is_thin_lever = false;        // thin/right-most lever behaves different from others
+  Rotor* _first_rotor = NULL;   // notch ring-contact rotor (NULL for the first lever)
+  Rotor* _second_rotor = NULL;  // ratchet-contact rotor
+  bool _is_first_lever = false; // first lever behaves slightly different from others
 };
 
 #endif

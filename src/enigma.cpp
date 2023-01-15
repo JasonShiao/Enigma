@@ -2,6 +2,7 @@
 //#include <array>
 #include <ctype.h>
 #include <cassert>
+#include <list>
 
 #include "enigma.h"
 
@@ -31,11 +32,6 @@ bool Enigma::addRotor(std::string rotor_name, char init_pos, char notch_pos, std
     leverSet.push_back(new Lever(*(rotorSet.end()-2), *(rotorSet.end()-1)));
   }
 
-  /* Everytime we change rotor setting/add rotor, we need to update status of all levers */
-  for(auto it = leverSet.begin(); it != leverSet.end(); it++) {
-    (*it)->update();
-  }
-
   return true;
 }
 
@@ -49,27 +45,33 @@ bool Enigma::setRotorPos(size_t rotor_idx, char pos)
     return false;
   }
 
-  /* Everytime we change rotor setting/add rotor, we need to update status of all levers */
-  for(auto it = leverSet.begin(); it != leverSet.end(); it++) {
-    (*it)->update();
-  }
-
   return true;
 }
 
 char Enigma::pressKey(char input_key)
 {
   DEBUG("Input: " << input_key << std::endl);
+  std::list<Rotor*> engaged_rotor_list;
 
   /* -------------- Mechanic parts ------------------ */
   // A Key is pressed
   for (auto lever_it = leverSet.begin(); lever_it != leverSet.end(); lever_it++) {
-    (*lever_it)->press();
+    if ((*lever_it)->checkEngaged()) {
+      if ((*lever_it)->getFirstRotor() != NULL) {
+        engaged_rotor_list.push_back((*lever_it)->getFirstRotor());
+      }
+      if ((*lever_it)->getSecondRotor() != NULL) {
+        engaged_rotor_list.push_back((*lever_it)->getSecondRotor());
+      }
+    }
   }
 
-  // Update status of levers after all rotors have been in a new state
-  for (auto lever_it = leverSet.begin(); lever_it != leverSet.end(); lever_it++){
-    (*lever_it)->update();
+  // Remove duplicate. Each rotor only rotate once in each press
+  engaged_rotor_list.unique();
+
+  // Rotate the engaged rotors
+  for (auto rotor_it = engaged_rotor_list.begin(); rotor_it != engaged_rotor_list.end(); rotor_it++) {
+    (*rotor_it)->rotate();
   }
 
   /* -------------- Electricity/Signal Flow ------------------ */
